@@ -1,29 +1,21 @@
-:root {
-  --primary-blue: #1e3a8a;
-  --secondary-purple: #7c3aed;
-  --accent-gold: #f59e0b;
-  --dark-blue: #0f172a;
-  --light-blue: #e0f2fe;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --background: #f8fafc;
-  --card-bg: #ffffff;
-  --gradient-cosmic: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #f59e0b 100%);
-  --gradient-time: linear-gradient(90deg, #0f172a 0%, #1e3a8a 25%, #7c3aed 75%, #f59e0b 100%);
-}
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RTL Support */
 * {
-  margin: 0;
-  padding: 0;
+  direction: rtl;
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Assistant', sans-serif;
-  background: var(--background);
-  color: var(--text-primary);
-  line-height: 1.6;
-  overflow-x: hidden;
+  font-family: 'Heebo', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e40af 100%);
+  min-height: 100vh;
 }
 
 /* Cosmic Background Animation */
@@ -112,6 +104,18 @@ h3 { font-size: 1.5rem; }
   padding: 2rem 0;
 }
 
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899);
+  transform: translateX(50%);
+  border-radius: 2px;
+}
+
 .timeline-line {
   position: absolute;
   left: 50%;
@@ -163,6 +167,35 @@ h3 { font-size: 1.5rem; }
   }
 }
 
+/* Cosmic background effects */
+@keyframes twinkle {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite;
+}
+
+/* Hover effects */
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   h1 { font-size: 2rem; }
@@ -181,6 +214,15 @@ h3 { font-size: 1.5rem; }
   
   .timeline-dot {
     left: 2rem;
+  }
+  
+  .timeline-container {
+    padding: 0 1rem;
+  }
+  
+  .timeline-container::before {
+    right: 20px;
+    transform: none;
   }
 }
 
