@@ -34,14 +34,33 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ events, categories }) =
     value: events.filter(event => event.category === category.id).length,
     color: category.color
   }));
-
   // Process data for significance distribution
   const significanceData = [
-    { name: '1-2', value: events.filter(e => e.significance <= 2).length },
-    { name: '3-4', value: events.filter(e => e.significance > 2 && e.significance <= 4).length },
-    { name: '5-6', value: events.filter(e => e.significance > 4 && e.significance <= 6).length },
-    { name: '7-8', value: events.filter(e => e.significance > 6 && e.significance <= 8).length },
-    { name: '9-10', value: events.filter(e => e.significance > 8).length }
+    { 
+      name: 'נמוכה (1-2)', 
+      value: events.filter(e => e.significance <= 2).length,
+      description: 'אירועים בעלי השפעה מקומית'
+    },
+    { 
+      name: 'בינונית (3-4)', 
+      value: events.filter(e => e.significance > 2 && e.significance <= 4).length,
+      description: 'אירועים בעלי השפעה אזורית'
+    },
+    { 
+      name: 'חשובה (5-6)', 
+      value: events.filter(e => e.significance > 4 && e.significance <= 6).length,
+      description: 'אירועים בעלי השפעה כלל-עולמית'
+    },
+    { 
+      name: 'קריטית (7-8)', 
+      value: events.filter(e => e.significance > 6 && e.significance <= 8).length,
+      description: 'אירועים המשנים את מהלך ההיסטוריה'
+    },
+    { 
+      name: 'מהפכנית (9-10)', 
+      value: events.filter(e => e.significance > 8).length,
+      description: 'אירועים הקובעים את עתיד היקום'
+    }
   ];
 
   // Process data for timeline evolution (events per era)
@@ -97,19 +116,38 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ events, categories }) =
           >
             <h3 className="text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6 text-center">
               התפלגות אירועים לפי קטגוריה
-            </h3>
-            <div className="h-64 lg:h-80">
+            </h3>            <div className="h-64 lg:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={categoryData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={window.innerWidth < 768 ? 80 : 120}
+                    outerRadius={window.innerWidth < 768 ? 60 : 90}
                     fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
+                    dataKey="value"                    label={({ name, percent, x, y }) => {
+                      // Calculate position outside the pie
+                      const angle = Math.atan2(y - (window.innerHeight * 0.25), x - (window.innerWidth * 0.25));
+                      const labelX = x + Math.cos(angle) * 30;
+                      const labelY = y + Math.sin(angle) * 30;
+                      
+                      return (
+                        <text
+                          x={labelX}
+                          y={labelY}
+                          fill="#ffffff"
+                          fontSize={window.innerWidth < 768 ? "12" : "14"}
+                          fontWeight="bold"
+                          textAnchor={labelX > x ? 'start' : 'end'}
+                          dominantBaseline="middle"
+                          stroke="#000000"
+                          strokeWidth="0.5"
+                        >
+                          {`${name}: ${(percent * 100).toFixed(0)}%`}
+                        </text>
+                      );
+                    }}
+                    labelLine={true}
                   >
                     {categoryData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -117,10 +155,11 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ events, categories }) =
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
                       borderRadius: '8px',
-                      color: 'white'
+                      color: 'white',
+                      fontWeight: 'bold'
                     }}
                   />
                 </PieChart>
@@ -128,36 +167,52 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ events, categories }) =
             </div>
           </motion.div>
 
-          {/* Significance Distribution */}
-          <motion.div
+          {/* Significance Distribution */}          <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             className="bg-white/10 backdrop-blur-md rounded-xl p-4 lg:p-6 border border-white/20"
           >
-            <h3 className="text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6 text-center">
+            <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 lg:mb-4 text-center">
               התפלגות לפי רמת חשיבות
             </h3>
+            <p className="text-gray-300 text-sm lg:text-base mb-4 lg:mb-6 text-center">
+              כמה אירועים יש בכל רמת השפעה על ההיסטוריה
+            </p>
             <div className="h-64 lg:h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={significanceData}>
+                <BarChart data={significanceData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis 
                     dataKey="name" 
                     stroke="white" 
-                    tick={{ fill: 'white', fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                    tick={{ fill: 'white', fontSize: window.innerWidth < 768 ? 10 : 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={window.innerWidth < 768 ? 80 : 60}
+                    interval={0}
                   />
                   <YAxis 
                     stroke="white" 
                     tick={{ fill: 'white', fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                    label={{ 
+                      value: 'מספר אירועים', 
+                      angle: -90, 
+                      position: 'insideLeft',
+                      style: { textAnchor: 'middle', fill: 'white' }
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
                       borderRadius: '8px',
                       color: 'white'
-                    }}
+                    }}                    formatter={(value, _name, props) => [
+                      `${value} אירועים`,
+                      props.payload.description
+                    ]}
+                    labelFormatter={(label) => `רמת חשיבות: ${label}`}
                   />
                   <Bar 
                     dataKey="value" 
@@ -173,42 +228,63 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ events, categories }) =
                 </BarChart>
               </ResponsiveContainer>
             </div>
+            
+            {/* Legend for significance levels */}
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs lg:text-sm">
+              {significanceData.map((item, index) => (
+                <div key={index} className="bg-white/5 rounded-lg p-2">
+                  <div className="font-bold text-white">{item.name}</div>
+                  <div className="text-gray-300">{item.description}</div>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
 
-        {/* Timeline Evolution */}
-        <motion.div
+        {/* Timeline Evolution */}        <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="bg-white/10 backdrop-blur-md rounded-xl p-4 lg:p-6 border border-white/20 mb-8"
         >
-          <h3 className="text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6 text-center">
+          <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 lg:mb-4 text-center">
             התפתחות האירועים לאורך ציר הזמן
           </h3>
+          <p className="text-gray-300 text-sm lg:text-base mb-4 lg:mb-6 text-center">
+            מספר האירועים החשובים בכל תקופה בהיסטוריית היקום
+          </p>
           <div className="h-64 lg:h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timelineData}>
+              <LineChart data={timelineData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis 
                   dataKey="era" 
                   stroke="white" 
-                  tick={{ fill: 'white', fontSize: window.innerWidth < 768 ? 10 : 12 }}
+                  tick={{ fill: 'white', fontSize: window.innerWidth < 768 ? 9 : 11 }}
                   angle={-45}
                   textAnchor="end"
                   height={window.innerWidth < 768 ? 80 : 60}
+                  interval={0}
                 />
                 <YAxis 
                   stroke="white" 
                   tick={{ fill: 'white', fontSize: window.innerWidth < 768 ? 12 : 14 }}
+                  label={{ 
+                    value: 'מספר אירועים', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle', fill: 'white' }
+                  }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderRadius: '8px',
                     color: 'white'
                   }}
+                  formatter={(value) => [`${value} אירועים`, 'מספר אירועים חשובים']}
+                  labelFormatter={(label) => `תקופה: ${label}`}
                 />
                 <Line 
                   type="monotone" 
@@ -220,6 +296,14 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ events, categories }) =
                 />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+          
+          {/* Timeline explanation */}
+          <div className="mt-4 bg-white/5 rounded-lg p-3">
+            <p className="text-gray-300 text-sm lg:text-base">
+              <strong className="text-white">הסבר:</strong> הגרף מציג כיצד קצב האירועים החשובים מואץ לאורך ההיסטוריה. 
+              שימו לב לעלייה הדרמטית בעידן המודרני - זהו ביטוי לקצב ההתפתחות המהיר של הטכנולוגיה והחברה האנושית.
+            </p>
           </div>
         </motion.div>
 
