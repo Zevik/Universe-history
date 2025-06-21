@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* RTL Support */
+/* RTL Support & Responsive Design */
 * {
   direction: rtl;
   box-sizing: border-box;
@@ -16,6 +16,20 @@ body {
   padding: 0;
   background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e40af 100%);
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Mobile-first responsive typography */
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  html { font-size: 16px; }
+}
+
+@media (min-width: 1024px) {
+  html { font-size: 18px; }
 }
 
 /* Cosmic Background Animation */
@@ -226,32 +240,170 @@ h3 { font-size: 1.5rem; }
   }
 }
 
-/* Scroll Animations */
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s ease;
+/* Enhanced Responsive Design */
+
+/* Mobile Timeline Adjustments */
+@media (max-width: 640px) {
+  .timeline-container {
+    padding: 0.5rem !important;
+  }
+  
+  .timeline-container::before {
+    display: none; /* Hide timeline line on mobile */
+  }
+  
+  /* Force cards to be full width and center aligned on mobile */
+  .timeline-card {
+    width: 100% !important;
+    margin: 1rem 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Adjust event card layouts for mobile */
+  .relative.flex.items-center {
+    flex-direction: column !important;
+    text-align: center;
+  }
+  
+  /* Mobile button sizing */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Mobile text sizing */
+  h1 { font-size: 1.875rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  /* Mobile spacing */
+  .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
 }
 
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Tablet Adjustments */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .timeline-container {
+    padding: 1.5rem;
+  }
+  
+  /* Tablet grid adjustments */
+  .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Desktop Enhancements */
+@media (min-width: 1024px) {
+  .timeline-container {
+    padding: 3rem;
+  }
+  
+  /* Enhanced hover effects for desktop */
+  .hover\\:scale-105:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: var(--light-blue);
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  button, .cursor-pointer, a {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .hover\\:bg-white\\/10:hover {
+    background-color: initial;
+  }
+  
+  .hover\\:border-blue-300:hover {
+    border-color: initial;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--gradient-cosmic);
-  border-radius: 4px;
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .cosmic-bg {
+    animation: none !important;
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-blue);
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  body {
+    background: #000;
+    color: #fff;
+  }
+  
+  .bg-white\\/10 {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  }
+  
+  .text-gray-200, .text-gray-300 {
+    color: #ffffff !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .cosmic-bg {
+    display: none;
+  }
+  
+  .bg-white\\/10 {
+    background-color: white !important;
+    border: 1px solid black !important;
+  }
+  
+  .text-white {
+    color: black !important;
+  }
+}
+
+/* Ultra-wide Screen Support */
+@media (min-width: 1920px) {
+  .max-w-7xl {
+    max-width: 1400px;
+  }
+}
+
+/* Small Screen Portrait Orientation */
+@media (max-width: 480px) and (orientation: portrait) {
+  .timeline-container {
+    padding: 0.25rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.5rem !important;
+  }
+  
+  .text-4xl {
+    font-size: 1.875rem !important;
+  }
+  
+  .grid-cols-1 {
+    gap: 0.75rem;
+  }
 }
